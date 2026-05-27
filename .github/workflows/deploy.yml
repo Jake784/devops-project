@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build imagen Docker
         run: docker build -t devops-app:latest .
