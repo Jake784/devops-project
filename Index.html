@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DevOps Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111827;
+      --border: #1e2d40;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Navbar */
+    nav {
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,14,26,0.9);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo::before {
+      content: '▶';
+      font-size: 10px;
+      animation: blink 1.5s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .nav-tags { display: flex; gap: 8px; }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--muted);
+    }
+    .tag.online { border-color: var(--green); color: var(--green); }
+
+    /* Hero */
+    .hero {
+      padding: 5rem 0 3rem;
+      text-align: center;
+    }
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.1s;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.2s;
+    }
+    .hero h1 span {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.3s;
+    }
+    .hero-badges {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.4s;
+    }
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 2px;
+      border: 1px solid;
+    }
+    .badge.blue  { border-color: var(--accent);  color: var(--accent);  background: rgba(0,212,255,0.05); }
+    .badge.green { border-color: var(--green);   color: var(--green);   background: rgba(16,185,129,0.05); }
+    .badge.purple{ border-color: var(--accent2); color: #a78bfa;        background: rgba(124,58,237,0.05); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Metrics */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 3rem 0;
+    }
+    .metric {
+      background: var(--surface);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .metric.blue::after  { background: var(--accent); }
+    .metric.green::after { background: var(--green); }
+    .metric.purple::after{ background: var(--accent2); }
+    .metric.amber::after { background: var(--amber); }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Pipeline */
+    .section { margin: 3rem 0; }
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .pipeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .pipe-step {
+      flex: 1;
+      background: var(--surface);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .pipe-step:not(:last-child)::after {
+      content: '›';
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 18px;
+      z-index: 2;
+    }
+    .pipe-step.done { background: rgba(16,185,129,0.05); }
+    .pipe-step.active { background: rgba(0,212,255,0.05); }
+
+    .pipe-icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .pipe-name {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .pipe-status {
+      font-size: 10px;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+    .pipe-step.done .pipe-status  { color: var(--green); }
+    .pipe-step.active .pipe-status{ color: var(--accent); }
+
+    /* Stack */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .stack-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .stack-card:hover { border-color: var(--accent); }
+    .stack-card .icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .stack-card h3 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .stack-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      margin-top: 4rem;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-inner span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .footer-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ftag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">DEVOPS DASHBOARD</div>
+    <div class="nav-tags">
+      <span class="tag online">● ONLINE</span>
+      <span class="tag">v1.0.0</span>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-label">Sistemas Operativos II — Proyecto Final</div>
+    <h1>Infraestructura<br><span>DevOps en la nube</span></h1>
+    <p>Aplicación desplegada en AWS EC2 mediante pipeline CI/CD automatizado con GitHub Actions y Docker Swarm.</p>
+    <div class="hero-badges">
+      <span class="badge blue">AWS EC2</span>
+      <span class="badge green">Docker</span>
+      <span class="badge purple">GitHub Actions</span>
+      <span class="badge blue">Docker Swarm</span>
+      <span class="badge green">Nginx</span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric blue">
+      <div class="metric-label">Instancia</div>
+      <div class="metric-value">EC2</div>
+      <div class="metric-sub">t2.micro · us-east-1</div>
+    </div>
+    <div class="metric green">
+      <div class="metric-label">Estado</div>
+      <div class="metric-value">Running</div>
+      <div class="metric-sub">Contenedor activo</div>
+    </div>
+    <div class="metric purple">
+      <div class="metric-label">Pipeline</div>
+      <div class="metric-value">CI/CD</div>
+      <div class="metric-sub">GitHub Actions</div>
+    </div>
+    <div class="metric amber">
+      <div class="metric-label">Orquestación</div>
+      <div class="metric-value">Swarm</div>
+      <div class="metric-sub">Docker Swarm</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Pipeline CI/CD</div>
+    <div class="pipeline">
+      <div class="pipe-step done">
+        <div class="pipe-icon">📝</div>
+        <div class="pipe-name">Push</div>
+        <div class="pipe-status">✓ completado</div>
+      </div>
+      <div class="pipe-step done">
+        <div class="pipe-icon">🔨</div>
+        <div class="pipe-name">Build</div>
+        <div class="pipe-status">✓ completado</div>
+      </div>
+      <div class="pipe-step done">
+        <div class="pipe-icon">🐳</div>
+        <div class="pipe-name">Docker</div>
+        <div class="pipe-status">✓ imagen lista</div>
+      </div>
+      <div class="pipe-step done">
+        <div class="pipe-icon">🚀</div>
+        <div class="pipe-name">Deploy</div>
+        <div class="pipe-status">✓ desplegado</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Stack tecnológico</div>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="icon">☁️</div>
+        <h3>Amazon Web Services</h3>
+        <p>EC2 t2.micro en us-east-1. VPC con grupos de seguridad y acceso SSH.</p>
+      </div>
+      <div class="stack-card">
+        <div class="icon">🐳</div>
+        <h3>Docker</h3>
+        <p>Contenedores con Docker Compose y orquestación mediante Docker Swarm.</p>
+      </div>
+      <div class="stack-card">
+        <div class="icon">⚙️</div>
+        <h3>GitHub Actions</h3>
+        <p>Pipeline automatizado: build, push a registry y deploy en cada commit.</p>
+      </div>
+      <div class="stack-card">
+        <div class="icon">🌐</div>
+        <h3>Nginx</h3>
+        <p>Servidor web sirviendo la aplicación en el puerto 80 dentro del contenedor.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>Sistemas Operativos II — 2026</span>
+    <div class="footer-tags">
+      <span class="ftag">Ubuntu 26.04</span>
+      <span class="ftag">Docker 29.5</span>
+      <span class="ftag">Nginx</span>
+      <span class="ftag">us-east-1</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

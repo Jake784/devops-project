@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Build imagen Docker
+        run: docker build -t devops-app:latest .
+
+      - name: Exportar imagen
+        run: docker save devops-app:latest | gzip > devops-app.tar.gz
+
+      - name: Copiar imagen a EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "devops-app.tar.gz"
+          target: "~/"
+
+      - name: Deploy en EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Cargar la nueva imagen
+            docker load < ~/devops-app.tar.gz
+
+            # Detener contenedor anterior si existe
+            docker stop web-app 2>/dev/null || true
+            docker rm web-app 2>/dev/null || true
+
+            # Levantar nuevo contenedor
+            docker run -d \
+              --name web-app \
+              --restart always \
+              -p 80:80 \
+              devops-app:latest
+
+            echo "✅ Deploy exitoso"
