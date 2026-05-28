@@ -34,18 +34,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Cargar la nueva imagen
+            # Upload and load the Docker image
             docker load < ~/devops-app.tar.gz
 
-            # Detener contenedor anterior si existe
+            # Stop and delete any existing container (if exists)
             docker stop web-app 2>/dev/null || true
             docker rm web-app 2>/dev/null || true
 
-            # Levantar nuevo contenedor
-            docker run -d \
-              --name web-app \
-              --restart always \
-              -p 80:80 \
-              devops-app:latest
+            # Force update the Docker service to use the new image
+            docker service update --force devops-stack_web
 
-            echo "✅ Deploy exitoso"
+            echo "✅ Deploy completed successfully!"
