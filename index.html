@@ -334,19 +334,19 @@
     <div class="nav-tags">
       <span class="tag online">● ONLINE</span>
       <span class="tag">v1.0.0</span>
+      <button onclick="logout()" style="
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        padding: 5px 14px;
+        border: 1px solid #ef4444;
+        border-radius: 2px;
+        color: #ef4444;
+        background: transparent;
+        cursor: pointer;">
+        Logout
+      </button>
     </div>
-    <button onclick="logout()" style="
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    padding: 5px 14px;
-    border: 1px solid #ef4444;
-    border-radius: 2px;
-    color: #ef4444;
-    background: transparent;
-    cursor: pointer;">
-    Logout
-    </button>
-  </div>
+</div>
 </nav>
 
 <div class="container">
@@ -440,6 +440,18 @@
   </div>
 
 </div>
+
+<footer>
+  <div class="footer-inner">
+    <span>Sistemas Operativos II — 2026</span>
+    <div class="footer-tags">
+      <span class="ftag">Ubuntu 26.04</span>
+      <span class="ftag">Docker 29.5</span>
+      <span class="ftag">Nginx</span>
+      <span class="ftag">us-east-1</span>
+    </div>
+  </div>
+</footer>
 <script>
   // Verificar sesión al cargar
   fetch('http://' + location.hostname + ':8080/me', { credentials: 'include' })
@@ -454,18 +466,5 @@
     window.location.href = '/login.html';
   }
 </script>
-
-<footer>
-  <div class="footer-inner">
-    <span>Sistemas Operativos II — 2026</span>
-    <div class="footer-tags">
-      <span class="ftag">Ubuntu 26.04</span>
-      <span class="ftag">Docker 29.5</span>
-      <span class="ftag">Nginx</span>
-      <span class="ftag">us-east-1</span>
-    </div>
-  </div>
-</footer>
-
 </body>
 </html>
