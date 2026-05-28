@@ -5,7 +5,6 @@ services:
     image: devops-app:latest
     ports:
       - "80:80"
-    restart: always
     deploy:
       replicas: 2
       update_config:
@@ -13,3 +12,35 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+
+  api:
+    image: devops-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=tasksdb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=tasksdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  db_data:

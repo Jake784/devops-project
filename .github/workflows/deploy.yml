@@ -12,19 +12,24 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Build imagen Docker
+      - name: Build imagen web
         run: docker build -t devops-app:latest .
 
-      - name: Exportar imagen
-        run: docker save devops-app:latest | gzip > devops-app.tar.gz
+      - name: Build imagen API
+        run: docker build -t devops-api:latest ./api
 
-      - name: Copiar imagen a EC2
+      - name: Exportar imágenes
+        run: |
+          docker save devops-app:latest | gzip > devops-app.tar.gz
+          docker save devops-api:latest | gzip > devops-api.tar.gz
+
+      - name: Copiar imágenes a EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "devops-app.tar.gz"
+          source: "devops-app.tar.gz,devops-api.tar.gz,docker-compose.yml"
           target: "~/"
 
       - name: Deploy en EC2
@@ -34,14 +39,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Upload and load the Docker image
             docker load < ~/devops-app.tar.gz
+            docker load < ~/devops-api.tar.gz
 
-            # Stop and delete any existing container (if exists)
             docker stop web-app 2>/dev/null || true
             docker rm web-app 2>/dev/null || true
 
-            # Force update the Docker service to use the new image
+            docker stack deploy -c ~/docker-compose.yml devops-stack
             docker service update --force devops-stack_web
+            docker service update --force devops-stack_api
 
-            echo "✅ Deploy completed successfully!"
+            echo "✅ Deploy exitoso"
