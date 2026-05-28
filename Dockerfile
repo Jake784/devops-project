@@ -3,6 +3,7 @@ FROM nginx:alpine
 
 # Copiar la app al directorio de Nginx
 COPY index.html /usr/share/nginx/html/index.html
+COPY login.html /usr/share/nginx/html/login.html
 
 # Exponer el puerto 80
 EXPOSE 80
