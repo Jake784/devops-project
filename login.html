@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — DevOps Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111827;
+      --border: #1e2d40;
+      --accent: #00d4ff;
+      --green: #10b981;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: '▶';
+      font-size: 10px;
+      animation: blink 1.5s step-end infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 4px;
+      padding: 11px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--red);
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="logo">DEVOPS DASHBOARD</div>
+  <h1>Iniciar sesión</h1>
+  <p class="subtitle">Ingresa tus credenciales para continuar</p>
+
+  <div class="field">
+    <label>Usuario</label>
+    <input type="text" id="username" placeholder="admin" autocomplete="username"/>
+  </div>
+
+  <div class="field">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+  </div>
+
+  <button class="btn" id="btn-login" onclick="login()">Ingresar</button>
+
+  <div class="error" id="error-msg"></div>
+
+  <div class="footer-text">Sistemas Operativos II — 2026</div>
+</div>
+
+<script>
+  // Si ya tiene sesión, redirigir al dashboard
+  fetch('http://' + location.hostname + ':8080/me', { credentials: 'include' })
+    .then(r => { if (r.ok) window.location.href = '/'; })
+    .catch(() => {});
+
+  async function login() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btn-login');
+    const errorMsg = document.getElementById('error-msg');
+
+    if (!username || !password) {
+      showError('Por favor completa todos los campos.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+    errorMsg.style.display = 'none';
+
+    try {
+      const res = await fetch('http://' + location.hostname + ':8080/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password })
+      });
+
+      if (res.ok) {
+        window.location.href = '/';
+      } else {
+        const data = await res.json();
+        showError(data.detail || 'Credenciales incorrectas.');
+      }
+    } catch (e) {
+      showError('Error de conexión con el servidor.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  // Enter para hacer login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+</script>
+</body>
+</html>

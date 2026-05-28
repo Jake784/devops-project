@@ -335,6 +335,17 @@
       <span class="tag online">● ONLINE</span>
       <span class="tag">v1.0.0</span>
     </div>
+    <button onclick="logout()" style="
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 14px;
+    border: 1px solid #ef4444;
+    border-radius: 2px;
+    color: #ef4444;
+    background: transparent;
+    cursor: pointer;">
+    Logout
+    </button>
   </div>
 </nav>
 
@@ -429,6 +440,20 @@
   </div>
 
 </div>
+<script>
+  // Verificar sesión al cargar
+  fetch('http://' + location.hostname + ':8080/me', { credentials: 'include' })
+    .then(r => { if (!r.ok) window.location.href = '/login.html'; })
+    .catch(() => window.location.href = '/login.html');
+
+  async function logout() {
+    await fetch('http://' + location.hostname + ':8080/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    window.location.href = '/login.html';
+  }
+</script>
 
 <footer>
   <div class="footer-inner">
