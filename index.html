@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DevOps Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     :root {
       --bg: #0a0e1a;
@@ -78,7 +79,8 @@
     .pipe-step { flex: 1; background: var(--surface); padding: 1.25rem 1rem; text-align: center; position: relative; }
     .pipe-step:not(:last-child)::after { content: '›'; position: absolute; right: -8px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; z-index: 2; }
     .pipe-step.done { background: rgba(16,185,129,0.05); }
-    .pipe-icon { font-size: 20px; margin-bottom: 6px; }
+    .pipe-icon { margin-bottom: 6px; display: flex; justify-content: center; }
+    .pipe-icon svg { width: 20px; height: 20px; stroke: var(--muted); }
     .pipe-name { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
     .pipe-status { font-size: 10px; margin-top: 4px; font-family: var(--font-mono); color: var(--green); }
 
@@ -86,14 +88,16 @@
     .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
     .stack-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; transition: border-color 0.2s; }
     .stack-card:hover { border-color: var(--accent); }
-    .stack-card .icon { font-size: 24px; margin-bottom: 10px; }
+    .stack-card .icon { margin-bottom: 12px; display: flex; }
+    .stack-card .icon svg { width: 24px; height: 24px; stroke: var(--accent); }
     .stack-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
     .stack-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
     /* Infra details */
     .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .infra-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.25rem; }
-    .infra-card h3 { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+    .infra-card h3 { font-family: var(--font-mono); font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .infra-card h3 svg { width: 14px; height: 14px; stroke: var(--accent); flex-shrink: 0; }
     .infra-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
     .infra-row:last-child { border-bottom: none; }
     .infra-key { font-size: 12px; color: var(--muted); }
@@ -206,11 +210,11 @@
   <div class="section">
     <div class="section-title">Pipeline CI/CD</div>
     <div class="pipeline">
-      <div class="pipe-step done"><div class="pipe-icon">📝</div><div class="pipe-name">Push</div><div class="pipe-status">✓ completado</div></div>
-      <div class="pipe-step done"><div class="pipe-icon">🔨</div><div class="pipe-name">Build</div><div class="pipe-status">✓ completado</div></div>
-      <div class="pipe-step done"><div class="pipe-icon">🐳</div><div class="pipe-name">Docker</div><div class="pipe-status">✓ imagen lista</div></div>
-      <div class="pipe-step done"><div class="pipe-icon">📦</div><div class="pipe-name">SCP</div><div class="pipe-status">✓ transferido</div></div>
-      <div class="pipe-step done"><div class="pipe-icon">🚀</div><div class="pipe-name">Deploy</div><div class="pipe-status">✓ desplegado</div></div>
+      <div class="pipe-step done"><div class="pipe-icon"><i data-lucide="git-commit-horizontal"></i></div><div class="pipe-name">Push</div><div class="pipe-status">✓ completado</div></div>
+      <div class="pipe-step done"><div class="pipe-icon"><i data-lucide="hammer"></i></div><div class="pipe-name">Build</div><div class="pipe-status">✓ completado</div></div>
+      <div class="pipe-step done"><div class="pipe-icon"><i data-lucide="box"></i></div><div class="pipe-name">Docker</div><div class="pipe-status">✓ imagen lista</div></div>
+      <div class="pipe-step done"><div class="pipe-icon"><i data-lucide="upload"></i></div><div class="pipe-name">SCP</div><div class="pipe-status">✓ transferido</div></div>
+      <div class="pipe-step done"><div class="pipe-icon"><i data-lucide="rocket"></i></div><div class="pipe-name">Deploy</div><div class="pipe-status">✓ desplegado</div></div>
     </div>
   </div>
 
@@ -220,7 +224,7 @@
     <div class="infra-grid">
 
       <div class="infra-card">
-        <h3>☁️ AWS EC2</h3>
+        <h3><i data-lucide="cloud"></i> AWS EC2</h3>
         <div class="infra-row"><span class="infra-key">Instancia</span><span class="infra-val blue">t2.micro</span></div>
         <div class="infra-row"><span class="infra-key">Región</span><span class="infra-val">us-east-1</span></div>
         <div class="infra-row"><span class="infra-key">IP pública</span><span class="infra-val blue">3.88.176.251</span></div>
@@ -232,7 +236,7 @@
       </div>
 
       <div class="infra-card">
-        <h3>🔒 Red y seguridad</h3>
+        <h3><i data-lucide="shield"></i> Red y seguridad</h3>
         <div class="infra-row"><span class="infra-key">VPC</span><span class="infra-val">vpc-03ceaae00889d4bcc</span></div>
         <div class="infra-row"><span class="infra-key">Security group</span><span class="infra-val">launch-wizard-3</span></div>
         <div class="infra-row"><span class="infra-key">Puerto 22</span><span class="infra-val green">SSH ✓</span></div>
@@ -244,7 +248,7 @@
       </div>
 
       <div class="infra-card">
-        <h3>🐳 Docker Swarm</h3>
+        <h3><i data-lucide="container"></i> Docker Swarm</h3>
         <div class="infra-row"><span class="infra-key">Stack</span><span class="infra-val blue">devops-stack</span></div>
         <div class="infra-row"><span class="infra-key">Servicio web</span><span class="infra-val green">2/2 réplicas</span></div>
         <div class="infra-row"><span class="infra-key">Servicio API</span><span class="infra-val green">1/1 réplica</span></div>
@@ -256,7 +260,7 @@
       </div>
 
       <div class="infra-card">
-        <h3>⚙️ Stack tecnológico</h3>
+        <h3><i data-lucide="layers"></i> Stack tecnológico</h3>
         <div class="infra-row"><span class="infra-key">Docker</span><span class="infra-val blue">v29.5.2</span></div>
         <div class="infra-row"><span class="infra-key">Docker Compose</span><span class="infra-val blue">v5.1.4</span></div>
         <div class="infra-row"><span class="infra-key">Nginx</span><span class="infra-val">alpine</span></div>
@@ -297,22 +301,22 @@
     <div class="section-title">Arquitectura de servicios</div>
     <div class="stack-grid">
       <div class="stack-card">
-        <div class="icon">☁️</div>
+        <div class="icon"><i data-lucide="cloud"></i></div>
         <h3>Amazon Web Services</h3>
         <p>EC2 t2.micro en us-east-1. VPC vpc-03ceaae con Security Group configurado para puertos 22, 80 y 8080.</p>
       </div>
       <div class="stack-card">
-        <div class="icon">🐳</div>
+        <div class="icon"><i data-lucide="container"></i></div>
         <h3>Docker Swarm</h3>
         <p>Orquestación con 4 contenedores: 2 réplicas web (Nginx), 1 API (FastAPI) y 1 base de datos (PostgreSQL).</p>
       </div>
       <div class="stack-card">
-        <div class="icon">⚙️</div>
+        <div class="icon"><i data-lucide="git-branch"></i></div>
         <h3>GitHub Actions CI/CD</h3>
         <p>Pipeline de 5 etapas: checkout → build → export → SCP → deploy. Se activa en cada push a main.</p>
       </div>
       <div class="stack-card">
-        <div class="icon">🗄️</div>
+        <div class="icon"><i data-lucide="database"></i></div>
         <h3>PostgreSQL + FastAPI</h3>
         <p>API REST con endpoints CRUD completos. Base de datos con tablas users y tasks con autenticación por sesión.</p>
       </div>
@@ -448,6 +452,7 @@
   }
 
   loadTasks();
+  lucide.createIcons();
 </script>
 </body>
 </html>
